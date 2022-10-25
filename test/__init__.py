@@ -84,6 +84,25 @@ class TestDAG(unittest.TestCase):
         with self.assertRaises(KeyError):
             _vertices = dag[1]
 
+    def test_subgraph(self):
+        """Requesting dag.subgraph(n) should generate a fresh DAG with n as the 'root node'"""
+        parent_dag: DAG[int] = DAG()
+        parent_dag.add_edge(1, 2)
+        parent_dag.add_edge(1, 3)
+        parent_dag.add_edge(3, 4)
+        parent_dag.add_edge(3, 5)
+        #   1
+        #  / \
+        # 2   3
+        #    / \
+        #   4   5
+        child_dag = parent_dag.subgraph(3)
+        #   3
+        #  / \
+        # 4   5
+        self.assertEqual(len(child_dag), 3)
+        self.assertEqual(len(child_dag[3]), 2)
+
     def test_cycles(self):
         """This should be compatible with graphlib's topological sorting"""
         dag: DAG[int] = DAG()
@@ -103,6 +122,6 @@ class TestDAG(unittest.TestCase):
         # 👎 cycle
         ts = graphlib.TopologicalSorter(dag)
         with self.assertRaises(graphlib.CycleError):
-            busted_order = list(ts.static_order())
+            _busted_order = list(ts.static_order())
         with self.assertRaises(graphlib.CycleError):
-            busted_order = list(dag.static_order())
+            _busted_order = list(dag.static_order())

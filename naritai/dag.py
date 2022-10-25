@@ -1,11 +1,15 @@
-from typing import Generic, Iterable, TypeVar
-from graphlib import TopologicalSorter, CycleError
+from __future__ import annotations
+
+from collections import defaultdict
+from collections.abc import Iterable, Iterator
+from typing import Generic, TypeVar
+from graphlib import TopologicalSorter
 
 V = TypeVar('V')
 
 class DAG(Generic[V]):
     """Creates a directed acyclic graph of type V"""
-    def __init__(self, initial_vertexes: list[tuple[V, V | None]] | None = None):
+    def __init__(self, initial_vertexes: list[tuple[V, V] | tuple[V]] | None = None):
         self._graph: dict[V, set[V]] = {}
         if initial_vertexes is not None:
             for edge in initial_vertexes:
@@ -57,7 +61,7 @@ class DAG(Generic[V]):
                 self._graph[vertex].remove(key)
         del self._graph[key]
 
-    def __iter__(self) -> Iterable[V]:
+    def __iter__(self) -> Iterator[V]:
         """Returns an iterator of the graph
 
         :return: An iterator of the graph's nodes
@@ -84,6 +88,25 @@ class DAG(Generic[V]):
             self.add_vertex(v)
         self._graph[u].add(v)
 
+    def subgraph(self, node: V) -> DAG[V]:
+        """Return a new dag object from the provided node downward
+
+        :param node: The node to act as the new 'head' of the graph
+
+        :return: A new graph centered at ``node``
+        """
+        if node not in self:
+            # not sure this is great - might be better to raise an exception
+            return DAG([(node,)])
+        vertices_to_visit: list[V] = [node]
+        edges: list[tuple[V, V] | tuple[V]] = [(node,)]
+        while len(vertices_to_visit) > 0:
+            next_node = vertices_to_visit.pop(0)
+            child_nodes = self[next_node]
+            vertices_to_visit.extend(child_nodes)
+            edges.extend([(next_node,n) for n in child_nodes])
+        return DAG(edges)
+
     def static_order(self) -> Iterable[V]:
         """Returns the nodes as an iterator topologicaly sorted
 
@@ -91,3 +114,10 @@ class DAG(Generic[V]):
         """
         ts = TopologicalSorter(self)
         return ts.static_order()
+
+    def __str__(self) -> str:
+        description = ''
+        for node in self._graph:
+            description += f'{repr(node)} -> [{", ".join([repr(x) for x in self._graph[node]])}]\n'
+        return description
+
