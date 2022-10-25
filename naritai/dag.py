@@ -8,9 +8,14 @@ from graphlib import TopologicalSorter
 V = TypeVar('V')
 
 class DAG(Generic[V]):
-    """Creates a directed acyclic graph of type V"""
+    """Creates a directed acyclic graph of type view
+
+    :param initial_vertexes: A list of initial edges
+    :type initial_vertexes: list[tuple[V, V] | tuple[V]]
+    """
     def __init__(self, initial_vertexes: list[tuple[V, V] | tuple[V]] | None = None):
         self._graph: dict[V, set[V]] = {}
+        # TODO: The typing for this is horrible and I don't like it
         if initial_vertexes is not None:
             for edge in initial_vertexes:
                 if len(edge) == 1:
@@ -98,13 +103,16 @@ class DAG(Generic[V]):
         if node not in self:
             # not sure this is great - might be better to raise an exception
             return DAG([(node,)])
+
         vertices_to_visit: list[V] = [node]
         edges: list[tuple[V, V] | tuple[V]] = [(node,)]
+
         while len(vertices_to_visit) > 0:
             next_node = vertices_to_visit.pop(0)
             child_nodes = self[next_node]
             vertices_to_visit.extend(child_nodes)
             edges.extend([(next_node,n) for n in child_nodes])
+
         return DAG(edges)
 
     def static_order(self) -> Iterable[V]:
