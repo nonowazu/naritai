@@ -30,16 +30,21 @@ class TestDAG(unittest.TestCase):
         dag: DAG[int] = DAG()
         dag.add_vertex(2)
         self.assertEqual(len(dag), 1)
-        self.assertEqual(len(dag[2]), 0) # should have no links
-        self.assertEqual(dag[2], set()) # should be an empty set
+        self.assertEqual(len(dag[2]), 0)  # should have no links
+        self.assertEqual(dag[2], set())  # should be an empty set
         dag.add_edge(2, 3)
         self.assertEqual(len(dag), 2)
-        self.assertEqual(len(dag[2]), 1) # should have one link
-        self.assertEqual(dag[2], {3,}) # should be equal to a set that has one value
+        self.assertEqual(len(dag[2]), 1)  # should have one link
+        self.assertEqual(
+            dag[2],
+            {
+                3,
+            },
+        )  # should be equal to a set that has one value
         dag.add_edge(2, 4)
         self.assertEqual(len(dag), 3)
-        self.assertEqual(len(dag[2]), 2) # two links now
-        self.assertCountEqual(dag[2], {3, 4}) # should have two links
+        self.assertEqual(len(dag[2]), 2)  # two links now
+        self.assertCountEqual(dag[2], {3, 4})  # should have two links
 
     def test_add_duplicates(self):
         """Since all the elements in the dag are by reference, adding the same
@@ -53,9 +58,9 @@ class TestDAG(unittest.TestCase):
         # one new vertex
         dag.add_edge(1, 2)
         self.assertEqual(len(dag), 2)
-        dag.add_vertex(2) # doesn't do anything, already exists
+        dag.add_vertex(2)  # doesn't do anything, already exists
         self.assertEqual(len(dag), 2)
-        dag.add_edge(1, 2) # doesn't do anything, both vertices already exist
+        dag.add_edge(1, 2)  # doesn't do anything, both vertices already exist
         self.assertEqual(len(dag), 2)
 
     def test_len(self):
@@ -65,7 +70,7 @@ class TestDAG(unittest.TestCase):
         self.assertEqual(len(dag), 1)
         dag.add_vertex(2)
         self.assertEqual(len(dag), 2)
-        dag.add_edge(1, 2) # shouldn't increase, since both nodes exist
+        dag.add_edge(1, 2)  # shouldn't increase, since both nodes exist
         self.assertEqual(len(dag), 2)
         dag.add_edge(1, 3)
         self.assertEqual(len(dag), 3)
@@ -133,10 +138,9 @@ class TestDAG(unittest.TestCase):
         # 4   5
         self.assertEqual(len(child_dag), 3)
         self.assertEqual(len(child_dag[3]), 2)
-        new_dag = child_dag.subgraph(2) # 2 doesn't exist in the child graph
+        new_dag = child_dag.subgraph(2)  # 2 doesn't exist in the child graph
         self.assertEqual(len(new_dag), 1)
         self.assertEqual(len(new_dag[2]), 0)
-        
 
     def test_cycles(self):
         """This should be compatible with graphlib's topological sorting"""

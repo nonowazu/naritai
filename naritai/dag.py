@@ -6,12 +6,14 @@ from graphlib import TopologicalSorter
 
 V = TypeVar('V')
 
+
 class DAG(Generic[V]):
     """Creates a directed acyclic graph of type view
 
     :param initial_vertexes: A list of initial edges
     :type initial_vertexes: list[tuple[V, V] | tuple[V]]
     """
+
     def __init__(self, initial_vertexes: list[tuple[V, V] | tuple[V]] | None = None):
         self._graph: dict[V, set[V]] = {}
         # TODO: The typing for this is horrible and I don't like it
@@ -115,7 +117,7 @@ class DAG(Generic[V]):
             next_node = vertices_to_visit.pop(0)
             child_nodes = self[next_node]
             vertices_to_visit.extend(child_nodes)
-            edges.extend([(next_node,n) for n in child_nodes])
+            edges.extend([(next_node, n) for n in child_nodes])
 
         return DAG(edges)
 
@@ -132,4 +134,3 @@ class DAG(Generic[V]):
         for node in self._graph:
             description += f'{repr(node)} -> [{", ".join([repr(x) for x in self._graph[node]])}]\n'
         return description
-
