@@ -5,7 +5,7 @@ from typing import Generic, TypeVar
 from graphlib import CycleError, TopologicalSorter
 
 V = TypeVar('V')
-EdgeType = tuple[V, V]
+EdgeList = list[tuple[V, V] | tuple[V]]
 
 
 class DAG(Generic[V]):
@@ -15,7 +15,7 @@ class DAG(Generic[V]):
     :type initial_vertexes: list[tuple[V, V] | tuple[V]]
     """
 
-    def __init__(self, initial_vertexes: list[EdgeType | tuple[V]] | None = None):
+    def __init__(self, initial_vertexes: EdgeList | None = None):
         self._graph: dict[V, set[V]] = {}
         # TODO: The typing for this is horrible and I don't like it
         if initial_vertexes is not None:
