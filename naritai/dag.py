@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Iterator
 from typing import Generic, TypeVar
-from graphlib import TopologicalSorter
+from graphlib import CycleError, TopologicalSorter
 
 V = TypeVar('V')
+EdgeType = tuple[V, V]
 
 
 class DAG(Generic[V]):
@@ -14,7 +15,7 @@ class DAG(Generic[V]):
     :type initial_vertexes: list[tuple[V, V] | tuple[V]]
     """
 
-    def __init__(self, initial_vertexes: list[tuple[V, V] | tuple[V]] | None = None):
+    def __init__(self, initial_vertexes: list[EdgeType | tuple[V]] | None = None):
         self._graph: dict[V, set[V]] = {}
         # TODO: The typing for this is horrible and I don't like it
         if initial_vertexes is not None:
@@ -128,6 +129,14 @@ class DAG(Generic[V]):
         """
         ts = TopologicalSorter(self)
         return ts.static_order()
+
+    @property
+    def has_cycle(self) -> bool:
+        try:
+            list(self.static_order())
+        except CycleError:
+            return True
+        return False
 
     def __str__(self) -> str:
         description = ''

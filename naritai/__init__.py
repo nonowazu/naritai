@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-__version__ = '0.0.0' # not functional, do not use
+__version__ = '0.0.0'  # not functional, do not use
 
 from naritai.dag import DAG
+
 
 class Step:
     def __init__(self, pipeline_ref: Pipeline):
@@ -16,6 +17,8 @@ class Step:
 
 
 class Pipeline:
+    """A naritai pipeline object"""
+
     def __init__(self):
         self.graph: DAG[Step] = DAG()
 
