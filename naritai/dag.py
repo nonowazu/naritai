@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import defaultdict
 from collections.abc import Iterable, Iterator
 from typing import Generic, TypeVar
 from graphlib import TopologicalSorter
@@ -57,13 +56,17 @@ class DAG(Generic[V]):
         return len(self._graph)
 
     def __delitem__(self, key: V):
-        """Deletes a node from the graph, including any edges to the node
+        """Deletes a node from the graph, including children and add edges that link to the node
 
         :param key: The node to remove
         """
+        to_delete = self[key].copy()
         for vertex in self._graph:
             if key in self._graph[vertex]:
                 self._graph[vertex].remove(key)
+        for node in to_delete:
+            # Is recursive delete the right thing to do here?
+            del self[node]
         del self._graph[key]
 
     def __iter__(self) -> Iterator[V]:
@@ -103,6 +106,7 @@ class DAG(Generic[V]):
         if node not in self:
             # not sure this is great - might be better to raise an exception
             return DAG([(node,)])
+        # TODO: check if graph is cyclic prior to starting, and bail out if so
 
         vertices_to_visit: list[V] = [node]
         edges: list[tuple[V, V] | tuple[V]] = [(node,)]
