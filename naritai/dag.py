@@ -132,6 +132,10 @@ class DAG(Generic[V]):
 
     @property
     def has_cycle(self) -> bool:
+        """Checks if there is a cycle in the graph.
+
+        :return: True if there is a cycle in the graph; False otherwise
+        """
         try:
             list(self.static_order())
         except CycleError:
